@@ -10,4 +10,17 @@ services:
       - 8000:8000
     env_file:
       - ./.env.dev
-      
+    
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=hello_nory
+      - POSTGRES_PASSWORD=hello_nory
+      - POSTGRES_DB=hello_nory_dev
+    ports:
+      - 54320:5432
+
+volumes:
+  postgres_data:    
