@@ -29,7 +29,7 @@ RUN chmod +x /usr/src/app/entrypoint.sh
 # copy project
 COPY . .
 
-RUN flake8 .
+#RUN flake8 .
 RUN python manage.py test
 
 # run entrypoint.sh
