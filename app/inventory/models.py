@@ -27,11 +27,23 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     recipe_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    quantity = models.FloatField()
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient')
 
     def __str__(self):
         return self.name
+
+
+class RecipeIngredient(models.Model):
+    recipe_ingredient_id = models.AutoField(primary_key=True)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    quantity = models.FloatField()
+
+    def __str__(self):
+        return f"{self.ingredient.name} in the {self.recipe.name}"
+
+    class Meta:
+        db_table = 'inventory_recipe_ingredient'
 
 
 class Modifier(models.Model):
