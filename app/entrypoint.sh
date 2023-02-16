@@ -13,5 +13,6 @@ fi
 
 python manage.py flush --no-input  # comment out if you don't want to flush on every container start or re-start
 python manage.py migrate
+python manage.py import
 
 exec "$@"

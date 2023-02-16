@@ -30,6 +30,21 @@ class Ingredient(models.Model):
         return self.name
 
 
+class IngredientStock(models.Model):
+
+    ingredient_stock_id = models.AutoField(primary_key=True)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    units_available = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return f"{self.units_available} {self.ingredient.unit} of {self.ingredient.name} at {self.location.name}"
+
+    class Meta:
+        db_table = 'inventory_ingredient_stock'
+        unique_together = ('ingredient', 'location',)
+
+
 class Recipe(models.Model):
     recipe_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)
