@@ -8,16 +8,22 @@ alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters a
 class Location(models.Model):
     location_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    address = models.CharField(max_length=200)
+    address = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
         return f"{self.name} at {self.address}"
 
 
 class Ingredient(models.Model):
+    class IngredientUnit(models.TextChoices):
+        MILILITER = 'mililiter'
+        CENTILITER = 'centiliter'
+        DECILITER = 'deciliter'
+        LITER = 'liter'
+
     ingredient_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    unit = models.CharField(max_length=50)
+    unit = models.CharField(max_length=16, choices=IngredientUnit.choices)
     cost = models.FloatField()
 
     def __str__(self):
@@ -26,7 +32,7 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
     recipe_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient')
 
     def __str__(self):
@@ -47,16 +53,24 @@ class RecipeIngredient(models.Model):
 
 
 class Modifier(models.Model):
-    class ModifierNames(models.TextChoices):
-        ADD_INGREDIENT = 'Add ingredient'
-        ALLERGENTS = 'Allergens'
-
     modifier_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=16, choices=ModifierNames.choices)
-    option = models.CharField(max_length=50)
+    name = models.CharField(max_length=16, unique=True)
 
     def __str__(self):
         return self.name
+
+
+class ModifierOption(models.Model):
+    modifier_option_id = models.AutoField(primary_key=True)
+    modifier = models.ForeignKey(Modifier, on_delete=models.CASCADE)
+    option = models.CharField(max_length=50)
+    price = models.FloatField()
+
+    def __str__(self):
+        return self.recipe.option
+
+    class Meta:
+        db_table = 'inventory_modifier_option'
 
 
 class Menu(models.Model):
@@ -76,14 +90,14 @@ class Staff(models.Model):
         CHEF = 'Chef'
         FRONT_OF_HOUSE = 'Front-of-house'
         MANAGER = 'Manager'
-    staff_id = models.AutoField(primary_key=True)
+    staff_id = models.IntegerField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     dob = models.DateField()
     role = models.CharField(max_length=16, choices=StaffRoles.choices)
-    iban = models.CharField(max_length=34, validators=[alphanumeric])
+    iban = models.CharField(max_length=34, validators=[alphanumeric], unique=True)
     bic = models.CharField(max_length=34, validators=[alphanumeric])
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location = models.ManyToManyField(Location)
 
     def __str__(self):
         return self.name
