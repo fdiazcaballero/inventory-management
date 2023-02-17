@@ -117,3 +117,37 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class StockAudit(models.Model):
+    class StockAuditReason(models.TextChoices):
+        DELIVERY = 'delivery'
+        SALE = 'sale'
+        WASTE = 'waste'
+
+    stock_audit_id = models.AutoField(primary_key=True)
+    reason = models.CharField(max_length=16, choices=StockAuditReason.choices, editable=False)
+    # Prevent deletion of the referenced objects, should use soft deletes
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, editable=False)
+    staff = models.ForeignKey(Staff, on_delete=models.PROTECT, editable=False)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.PROTECT, editable=False)
+    units_change = models.FloatField(editable=False)
+    # We need this calculation in real time beacuse the cost of an ingredient can vary over time
+    cost = models.FloatField(editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'inventory_stock_audit'
+
+
+class SalesAudit(models.Model):
+    sales_audit_id = models.AutoField(primary_key=True)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, editable=False)
+    staff = models.ForeignKey(Staff, on_delete=models.PROTECT, editable=False)
+    menu = models.ForeignKey(Menu, on_delete=models.PROTECT, editable=False)
+    # We need this calculation in real time beacuse the cost of an ingredient can vary over time
+    sale_amount = models.FloatField(editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'inventory_sale_audit'
