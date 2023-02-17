@@ -22,7 +22,7 @@ class Ingredient(models.Model):
         LITER = 'liter'
 
     ingredient_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     unit = models.CharField(max_length=16, choices=IngredientUnit.choices)
     cost = models.FloatField()
 
@@ -78,6 +78,7 @@ class Modifier(models.Model):
 class ModifierOption(models.Model):
     modifier_option_id = models.AutoField(primary_key=True)
     modifier = models.ForeignKey(Modifier, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, blank=True, null=True)
     option = models.CharField(max_length=50)
     price = models.FloatField()
 

@@ -64,7 +64,8 @@ class Command(BaseCommand):
         with transaction.atomic():
             for row in sheet.iter_rows(min_row=2, values_only=True):
                 modifier, created = Modifier.objects.get_or_create(name=row[1])
-                modifier_option = ModifierOption(option=row[2], price=row[3], modifier=modifier)
+                ingredient = Ingredient.objects.filter(name=row[2]).first()
+                modifier_option = ModifierOption(option=row[2], price=row[3], modifier=modifier, ingredient=ingredient)
                 modifier_option.save()
 
     def import_menus(self, sheet):
