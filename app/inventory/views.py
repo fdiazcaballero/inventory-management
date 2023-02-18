@@ -131,7 +131,7 @@ def sell_item(request, menu_id):
         return Response('Missing location or staff does not work in location', status=status.HTTP_400_BAD_REQUEST)
 
     menu = Menu.objects.filter(menu_id=menu_id).first()
-    if not menu or not menu.location.location_id != location.location_id:
+    if not menu or not menu.location.location_id == location.location_id:
         return Response('Missing menu_id or menu not available in location', status=status.HTTP_400_BAD_REQUEST)
 
     recipe_ingredients = RecipeIngredient.objects.filter(recipe=menu.recipe)
@@ -232,7 +232,7 @@ def generate_finantial_summary(request):
 
     writer = csv.writer(response)
     writer.writerow([
-        'location',
+        'location_id',
         'period',
         'total revenue from sales (in period)',
         'total deliveries cost (in period)',
